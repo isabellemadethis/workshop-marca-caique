@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#060606" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Marca" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
+<title>Workshop · Marca Pessoal</title>
+<style>
+  :root {
+    --bg: #060606;
+    --bg-2: #0d0d0d;
+    --card: #1A1A1A;
+    --card-2: #222;
+    --text: #F2F2F2;
+    --muted: #A0A0A0;
+    --accent: #07D379;
+    --accent-dim: #07D37920;
+    --border: #2a2a2a;
+    --font-display: "SF Pro Display", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+    --font-text: "SF Pro Text", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--font-text); }
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior-y: contain;
+  }
+  button, input, textarea { font-family: inherit; }
+
+  /* ========== HEADER ========== */
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgba(6, 6, 6, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: calc(env(safe-area-inset-top) + 14px) 18px 12px;
+  }
+  .app-header-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .app-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .app-title span { color: var(--accent); }
+  .header-actions { display: flex; gap: 8px; }
+  .icon-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--text);
+    width: 36px; height: 36px; border-radius: 999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s ease;
+  }
+  .icon-btn:hover, .icon-btn:active { background: var(--card); border-color: var(--accent); color: var(--accent); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .progress-bar {
+    margin-top: 12px;
+    height: 3px;
+    background: var(--card);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .4s cubic-bezier(.16,1,.3,1);
+  }
+  .progress-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    display: flex; justify-content: space-between;
+  }
+
+  /* ========== MAIN ========== */
+  main {
+    padding: 24px 18px calc(96px + env(safe-area-inset-bottom)) 18px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .block { display: none; animation: fadeIn .35s ease; }
+  .block.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .block-intro { margin-bottom: 24px; }
+  .block-tag {
+    display: inline-block;
+    color: var(--accent);
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .block-title {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin: 0 0 10px;
+    line-height: 1.1;
+  }
+  .block-subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0 0 18px;
+  }
+
+  .slides-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s ease;
+    margin-bottom: 28px;
+  }
+  .slides-btn:hover, .slides-btn:active { border-color: var(--accent); color: var(--accent); }
+  .slides-btn svg { width: 14px; height: 14px; }
+
+  /* ========== CARDS DE PERGUNTA ========== */
+  .section-header {
+    margin-top: 36px;
+    margin-bottom: 14px;
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  .section-header:first-of-type { margin-top: 8px; }
+  .section-instr {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.55;
+    margin: -6px 0 18px;
+  }
+  .section-instr em { color: var(--text); font-style: normal; }
+
+  .callout {
+    background: linear-gradient(180deg, rgba(7,211,121,.07), rgba(7,211,121,.02));
+    border: 1px solid rgba(7,211,121,.25);
+    border-left: 3px solid var(--accent);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 22px;
+  }
+  .callout strong { color: var(--accent); }
+  .callout p { margin: 0 0 8px; line-height: 1.55; font-size: 14px; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .synth {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 26px;
+  }
+  .synth h3 {
+    font-family: var(--font-display);
+    font-size: 17px;
+    margin: 0 0 12px;
+    color: var(--text);
+  }
+  .synth p { margin: 0 0 12px; font-size: 14px; line-height: 1.6; color: #d8d8d8; }
+  .synth p:last-child { margin-bottom: 0; }
+  .synth strong { color: var(--accent); font-weight: 600; }
+  .synth blockquote {
+    margin: 16px 0 0;
+    padding: 12px 14px;
+    border-left: 2px solid var(--accent);
+    color: var(--muted);
+    font-style: italic;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .question {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    transition: border-color .2s ease;
+  }
+  .question:focus-within { border-color: var(--accent); }
+  .question[data-filled="true"] { border-color: rgba(7,211,121,.35); }
+  .question-label {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .question-num {
+    display: inline-block;
+    color: var(--accent);
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .question-hint {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .question-hint em { color: #c4c4c4; font-style: normal; }
+
+  textarea {
+    width: 100%;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.55;
+    padding: 12px 14px;
+    resize: none;
+    outline: none;
+    min-height: 88px;
+    transition: border-color .15s ease, background .15s ease;
+    font-family: var(--font-text);
+  }
+  textarea::placeholder { color: #555; }
+  textarea:focus {
+    border-color: var(--accent);
+    background: #0a0a0a;
+  }
+
+  .examples {
+    background: rgba(255,255,255,.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 22px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #c8c8c8;
+  }
+  .examples h4 {
+    font-family: var(--font-display);
+    font-size: 12px;
+    color: var(--accent);
+    margin: 0 0 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .examples ul { padding-left: 18px; margin: 8px 0 0; }
+  .examples li { margin-bottom: 4px; }
+  .examples .ex-mini { color: var(--muted); }
+
+  .util-tag {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  /* ========== BOTTOM NAV ========== */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 40;
+    background: rgba(6, 6, 6, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+  .nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    padding: 8px 4px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: color .15s ease, background .15s ease;
+    position: relative;
+  }
+  .nav-btn svg { width: 20px; height: 20px; }
+  .nav-btn span {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+  }
+  .nav-btn.active { color: var(--accent); }
+  .nav-btn:active { background: var(--card); }
+  .nav-dot {
+    position: absolute;
+    top: 6px; right: 18px;
+    width: 6px; height: 6px;
+    border-radius: 999px;
+    background: var(--accent);
+    opacity: 0;
+    transform: scale(.5);
+    transition: all .25s ease;
+  }
+  .nav-btn[data-complete="true"] .nav-dot { opacity: 1; transform: scale(1); }
+
+  /* ========== SAVED INDICATOR ========== */
+  .saved-indicator {
+    position: fixed;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all .35s cubic-bezier(.16,1,.3,1);
+    z-index: 35;
+    white-space: nowrap;
+  }
+  .saved-indicator.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .saved-indicator .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 999px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ========== MODAL (slides + export) ========== */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 50;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeBg .25s ease;
+  }
+  .modal-backdrop.visible { display: flex; }
+  @keyframes fadeBg { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: var(--bg-2);
+    border-top: 1px solid var(--border);
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-width: 720px;
+    max-height: 92dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp .35s cubic-bezier(.16,1,.3,1);
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+  .modal-grip {
+    width: 38px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 999px;
+    margin: 10px auto 0;
+  }
+  .modal-header {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .modal-close {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px 8px;
+  }
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 18px;
+  }
+
+  /* ========== CARROSSEL DE SLIDES ========== */
+  .carousel {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .carousel-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .carousel-track::-webkit-scrollbar { display: none; }
+  .carousel-slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .carousel-slide img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .carousel-indicators {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin: 4px 0 8px;
+    flex-wrap: wrap;
+  }
+  .carousel-dot {
+    width: 7px; height: 7px;
+    border-radius: 999px;
+    background: var(--border);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+  .carousel-dot.active { background: var(--accent); transform: scale(1.4); }
+  .carousel-meta {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  /* ========== EXPORT MODAL ========== */
+  .export-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    width: 100%;
+    text-align: left;
+    color: var(--text);
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: all .15s ease;
+  }
+  .export-option:hover, .export-option:active {
+    border-color: var(--accent);
+    background: #1f1f1f;
+  }
+  .export-option svg {
+    width: 22px; height: 22px;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .export-option-text { flex: 1; }
+  .export-option-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .export-option-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .export-summary {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 18px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .export-summary strong { color: var(--accent); }
+
+  /* iPhone notch + spacing tweaks */
+  @media (max-width: 380px) {
+    .block-title { font-size: 26px; }
+    main { padding: 20px 14px calc(96px + env(safe-area-inset-bottom)); }
+    .question { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="app-header">
+  <div class="app-header-row">
+    <h1 class="app-title">Marca<span>.</span></h1>
+    <div class="header-actions">
+      <button class="icon-btn" id="btnExport" aria-label="Exportar respostas" title="Exportar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div class="progress-label">
+    <span id="progressBlock">Bloco atual</span>
+    <span id="progressText">0%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</header>
+
+<!-- ============ MAIN ============ -->
+<main>
+
+<!-- ============ BLOCO 1 — IKIGAI ============ -->
+<section class="block active" data-block="ikigai">
+  <div class="block-intro">
+    <span class="block-tag">01 · Ikigai</span>
+    <h2 class="block-title">Razão de viver</h2>
+    <p class="block-subtitle">Onde paixão, habilidade, oportunidade e missão se cruzam.</p>
+    <button class="slides-btn" data-slides="ikigai">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      Consultar slides do Lona
+    </button>
+  </div>
+
+  <h3 class="section-header">As 5 esferas</h3>
+  <p class="section-instr">Liste o máximo de itens que conseguir em cada esfera. <em>Sem filtro. Quanto mais bagunçado, mais útil.</em> Depois, tente escolher 1-2 itens em cada esfera e fazer combinações.</p>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">1.</span>Habilidade</label>
+    <span class="question-hint">O que você sabe fazer? Em que você já escutou alguém dizer que você é bom?</span>
+    <textarea data-key="ikigai.habilidade" placeholder="Liste sem filtro..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">2.</span>Felicidade</label>
+    <span class="question-hint">O que te faz feliz? O que importa pra você? O que você faz quando está cansado, depois de tantas horas de trabalho?</span>
+    <textarea data-key="ikigai.felicidade" placeholder="Liste sem filtro..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">3.</span>Oportunidade</label>
+    <span class="question-hint">Quais oportunidades você vê em volta de você? Dentro do seu ecossistema?</span>
+    <textarea data-key="ikigai.oportunidade" placeholder="Liste sem filtro..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">4.</span>Paixão</label>
+    <span class="question-hint">O que faz o coração vibrar? Aquilo que você pagaria pra fazer / faria de graça?</span>
+    <textarea data-key="ikigai.paixao" placeholder="Liste sem filtro..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">5.</span>Serviço</label>
+    <span class="question-hint">Lista de serviços e produtos que você consegue imaginar que poderia oferecer (consultoria, mentoria, infoprodutos, etc.)</span>
+    <textarea data-key="ikigai.servico" placeholder="Liste sem filtro..."></textarea>
+  </div>
+
+  <h3 class="section-header">Os 6 prompts de Diferenciais</h3>
+  <p class="section-instr">Depois das esferas, esse é o exercício que aperta o foco: <em>o que te torna único no mercado?</em></p>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">1.</span>Alternativas competitivas</label>
+    <span class="question-hint">Se você não existisse, o que as pessoas fariam?</span>
+    <textarea data-key="ikigai.diff1" placeholder="..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">2.</span>Atributos únicos</label>
+    <span class="question-hint">Quais características/capacidades você tem que as alternativas não?</span>
+    <textarea data-key="ikigai.diff2" placeholder="..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">3.</span>Valor (e prova)</label>
+    <span class="question-hint">Qual valor/transformação esses atributos criam pros consumidores?</span>
+    <textarea data-key="ikigai.diff3" placeholder="..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">4.</span>Características do mercado-alvo</label>
+    <span class="question-hint">Quem se importa muito com esse valor/transformação?</span>
+    <textarea data-key="ikigai.diff4" placeholder="..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">5.</span>Categoria de mercado</label>
+    <span class="question-hint">Qual contexto torna seu valor/transformação óbvio pro consumidor?</span>
+    <textarea data-key="ikigai.diff5" placeholder="..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">6.</span>Tendências relevantes</label>
+    <span class="question-hint">Quais tendências fazem do seu produto/serviço relevante AGORA?</span>
+    <textarea data-key="ikigai.diff6" placeholder="..."></textarea>
+  </div>
+</section>
+
+<!-- ============ BLOCO 2 — COMUNIDADE ============ -->
+<section class="block" data-block="comunidade">
+  <div class="block-intro">
+    <span class="block-tag">02 · Comunidade</span>
+    <h2 class="block-title">Comece pela comunidade</h2>
+    <p class="block-subtitle">Antes de buscar cliente, encontre sua turma.</p>
+    <button class="slides-btn" data-slides="comunidade">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      Consultar slides do Lona
+    </button>
+  </div>
+
+  <div class="synth">
+    <h3>Antes de responder, leia isto</h3>
+    <p>A pergunta tradicional <em>"quem é meu cliente?"</em> está riscada no método do Lona. Em vez dela, ele pergunta: <strong>onde posso ajudar porque entendo o que tá rolando?</strong></p>
+    <p>A diferença é que comunidade não é networking. Networking é "um conhece um". Comunidade é gente que se reconhece mesmo sem se conhecer — existe um aperto de mão silencioso entre quem é da mesma tribo. Você já faz parte de várias sem perceber.</p>
+    <p>Em qualquer comunidade, vale a pirâmide 90/9/1 (McConnell, 2007): <strong>90% só consomem, 9% participam, 1% lideram</strong>. O objetivo é ser o 1% — quem nutre, contribui, ensina. <strong>Posicionamento é uma prática, não uma declaração</strong>: você não escreve uma frase na bio, você FAZ todo dia.</p>
+    <p>Quando a comunidade percebe que pode confiar em você — que você está ali pra contribuir e nutrir — ela ajuda seu negócio a ter sucesso. As comunidades <strong>já existem</strong>. Você não precisa criar, você precisa <strong>servir</strong>.</p>
+    <blockquote>"Trabalhe em público. Ensine tudo o que sabe. Crie todos os dias." — Nathan Barry</blockquote>
+  </div>
+
+  <h3 class="section-header">Você já faz parte de comunidades</h3>
+  <p class="section-instr">Responda com calma. Pense em grupos, contextos, círculos. Nada precisa ser oficial.</p>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">1.</span>Quando eu falo, quem escuta?</label>
+    <textarea data-key="comunidade.q1" placeholder="..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">2.</span>Com quem e onde eu passo meu tempo, online e offline?</label>
+    <textarea data-key="comunidade.q2" placeholder="..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">3.</span>Em quais situações sou mais autêntico?</label>
+    <textarea data-key="comunidade.q3" placeholder="..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">4.</span>Com quem eu convivo, mesmo que não goste tanto deles, mas vale a pena por compartilharmos algo mais importante?</label>
+    <textarea data-key="comunidade.q4" placeholder="..."></textarea>
+  </div>
+
+  <h3 class="section-header">Os 4 tipos de Utilidade</h3>
+  <p class="section-instr">Pra fugir das verticais tradicionais, aprenda a olhar habilidades como produtos específicos pra pessoas específicas. Pra cada uma das 4 utilidades, pense em <em>pelo menos 1 ideia adaptada à sua realidade no mercado de cabelo / imagem masculina</em>.</p>
+
+  <div class="question">
+    <label class="question-label"><span class="util-tag">Lugar.</span> Fazer algo inacessível se tornar acessível</label>
+    <span class="question-hint"><em>Exemplo do Lona:</em> "Guia de comunicação pra cafeterias independentes."</span>
+    <textarea data-key="comunidade.util1" placeholder="Sua ideia..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="util-tag">Forma.</span> Tornar algo mais valioso reorganizando peças existentes</label>
+    <span class="question-hint"><em>Exemplo do Lona:</em> "Análise de posicionamento no Insta."</span>
+    <textarea data-key="comunidade.util2" placeholder="Sua ideia..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="util-tag">Tempo.</span> Fazer algo lento se tornar rápido</label>
+    <span class="question-hint"><em>Exemplo do Lona:</em> "Sistema de embalagem pra delivery de café."</span>
+    <textarea data-key="comunidade.util3" placeholder="Sua ideia..."></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="util-tag">Posse.</span> Remover um intermediário</label>
+    <span class="question-hint"><em>Exemplo do Lona:</em> "Plataforma pra conectar microprodutores com cafeterias independentes."</span>
+    <textarea data-key="comunidade.util4" placeholder="Sua ideia..."></textarea>
+  </div>
+</section>
+
+<!-- ============ BLOCO 3 — VERTICAIS E HORIZONTAIS ============ -->
+<section class="block" data-block="verticais">
+  <div class="block-intro">
+    <span class="block-tag">03 · Verticais & Horizontais</span>
+    <h2 class="block-title">Verticais &amp; horizontais</h2>
+    <p class="block-subtitle">O processo de posicionamento começa listando as possibilidades.</p>
+    <button class="slides-btn" data-slides="verticais">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      Consultar slides do Lona
+    </button>
+  </div>
+
+  <div class="examples">
+    <h4>Antes de listar — entenda os eixos</h4>
+    <p><strong style="color:var(--accent)">Vertical</strong> = indústrias, mercados, segmentos.</p>
+    <p class="ex-mini">Ex.: cafeterias independentes · turismo de luxo · wellness/fitness · construtoras.</p>
+    <p style="margin-top:10px"><strong style="color:var(--accent)">Horizontal</strong> = demografia, psicografia, etnografia, etapa-na-jornada, tipo de serviço, necessidade.</p>
+    <p class="ex-mini">Ex.: líderes de marketing recém-promovidos · arquitetos recém-formados · CEOs em ambiente de mudança.</p>
+
+    <h4 style="margin-top:14px">Combinações pra inspirar (exemplos do Lona)</h4>
+    <ul>
+      <li>E-commerce de roupas de maternidade <em>sustentáveis</em></li>
+      <li>Consultoria em TI pra <em>fintech early-stage</em></li>
+      <li>Academia de dança pra <em>mulheres da melhor idade</em></li>
+      <li>Centro de pilates pra <em>atletas profissionais</em></li>
+      <li>Escola de inglês online pra <em>futuras CEOs brasileiras</em></li>
+      <li>Estúdio de design de interiores pra <em>espaços comerciais de cafeterias</em></li>
+      <li>Fisio em drenagem linfática pra <em>mulheres na perimenopausa</em></li>
+    </ul>
+  </div>
+
+  <h3 class="section-header">Liste o máximo de opções</h3>
+  <p class="section-instr">Interesses, hobbies, paixões, experiências passadas, habilidades. Não filtre.</p>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">1.</span>Verticais que você gostaria de atender</label>
+    <span class="question-hint">Indústrias, mercados, segmentos. <em>Junte o máximo de opções possível.</em></span>
+    <textarea data-key="verticais.lista_v" placeholder="Liste sem filtro..." style="min-height: 140px"></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">2.</span>Horizontais que você gostaria de atender</label>
+    <span class="question-hint">Demografia, psicografia, etnografia, etapa-na-jornada, tipo de serviço, necessidade. <em>Junte o máximo possível.</em></span>
+    <textarea data-key="verticais.lista_h" placeholder="Liste sem filtro..." style="min-height: 140px"></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">3.</span>Analise as listas e tente fazer combinações</label>
+    <span class="question-hint">Vertical + Horizontal = posicionamento candidato. Liste todas as combinações que parecerem interessantes — mesmo as estranhas.</span>
+    <textarea data-key="verticais.combos" placeholder="Ex.: 'Cabelo masculino pra advogados de startups'..." style="min-height: 160px"></textarea>
+  </div>
+</section>
+
+<!-- ============ BLOCO 4 — HISTÓRIA ============ -->
+<section class="block" data-block="historia">
+  <div class="block-intro">
+    <span class="block-tag">04 · História de Criação</span>
+    <h2 class="block-title">História de criação</h2>
+    <p class="block-subtitle">Conta o passado, justifica o presente, convida pro futuro.</p>
+    <button class="slides-btn" data-slides="historia">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      Consultar slides do Lona
+    </button>
+  </div>
+
+  <div class="callout">
+    <p><strong>⚠ Esse é o bloco mais importante. Seja MUITO detalhista.</strong></p>
+    <p>Não economize. Não corte história achando que é irrelevante. <strong>Fale tudo o que vier à cabeça</strong> — escolhi essas perguntas porque elas vão alimentar a base da sua marca pessoal. Quanto mais material bruto você jogar aqui, melhor a estratégia que a gente constrói depois.</p>
+    <p>Sem pressa. Pode voltar e adicionar coisa quando lembrar.</p>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">1.</span>Passado (origem): de onde veio?</label>
+    <span class="question-hint">Qual é a sua história e como ela moldou sua jornada até aqui?</span>
+    <textarea data-key="historia.passado" placeholder="Comece pelo começo. Sem pressa..." style="min-height: 200px"></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">2.</span>Ponto de inflexão (problema): o que aconteceu?</label>
+    <span class="question-hint">Quando você enfrentou um desafio significativo que mudou sua perspectiva e impulsionou seu crescimento?</span>
+    <textarea data-key="historia.inflexao" placeholder="O momento que virou a chave..." style="min-height: 200px"></textarea>
+  </div>
+
+  <div class="question">
+    <label class="question-label"><span class="question-num">3.</span>Convite (resultado): quem é você hoje?</label>
+    <span class="question-hint">Com base em suas experiências e aprendizados, como você se tornou a pessoa que é hoje e qual é o impacto que você deseja causar no mundo?</span>
+    <textarea data-key="historia.convite" placeholder="Quem você é, o que você convida..." style="min-height: 200px"></textarea>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ SAVED INDICATOR ============ -->
+<div class="saved-indicator" id="savedIndicator"><span class="dot"></span><span id="savedText">Salvo</span></div>
+
+<!-- ============ BOTTOM NAV ============ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-target="ikigai">
+    <div class="nav-dot"></div>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
+    <span>Ikigai</span>
+  </button>
+  <button class="nav-btn" data-target="comunidade">
+    <div class="nav-dot"></div>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span>Comunidade</span>
+  </button>
+  <button class="nav-btn" data-target="verticais">
+    <div class="nav-dot"></div>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+    <span>Eixos</span>
+  </button>
+  <button class="nav-btn" data-target="historia">
+    <div class="nav-dot"></div>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <span>História</span>
+  </button>
+</nav>
+
+<!-- ============ MODAL SLIDES ============ -->
+<div class="modal-backdrop" id="slidesModal" role="dialog" aria-modal="true" aria-label="Slides do Lona">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-grip"></div>
+    <div class="modal-header">
+      <h3 class="modal-title" id="slidesTitle">Slides</h3>
+      <button class="modal-close" data-close>Fechar</button>
+    </div>
+    <div class="modal-body">
+      <div class="carousel-meta" id="carouselMeta">Slide 1 de N</div>
+      <div class="carousel">
+        <div class="carousel-track" id="carouselTrack"></div>
+      </div>
+      <div class="carousel-indicators" id="carouselDots"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL EXPORT ============ -->
+<div class="modal-backdrop" id="exportModal" role="dialog" aria-modal="true" aria-label="Exportar respostas">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-grip"></div>
+    <div class="modal-header">
+      <h3 class="modal-title">Exportar respostas</h3>
+      <button class="modal-close" data-close>Fechar</button>
+    </div>
+    <div class="modal-body">
+      <div class="export-summary" id="exportSummary"></div>
+      <button class="export-option" id="btnCopyAll">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <div class="export-option-text">
+          <div class="export-option-title">Copiar tudo</div>
+          <div class="export-option-desc">Cola no WhatsApp da Isabelle ou onde preferir.</div>
+        </div>
+      </button>
+      <button class="export-option" id="btnEmail">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div class="export-option-text">
+          <div class="export-option-title">Enviar pra Isabelle</div>
+          <div class="export-option-desc">Abre seu app de email com tudo pré-formatado.</div>
+        </div>
+      </button>
+      <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5">
+        Tudo é salvo no seu celular. Nada sai daqui sem você apertar exportar.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ DADOS DOS SLIDES ============
+const SLIDES = {
+  ikigai: {
+    title: "Ikigai · Especialista x Generalista",
+    pages: [
+      { p: 13, src: "slides/ikigai/p13.webp" },
+      { p: 14, src: "slides/ikigai/p14.webp" },
+      { p: 15, src: "slides/ikigai/p15.webp" },
+      { p: 16, src: "slides/ikigai/p16.webp", highlight: true },
+      { p: 17, src: "slides/ikigai/p17.webp" },
+      { p: 18, src: "slides/ikigai/p18.webp", highlight: true }
+    ]
+  },
+  comunidade: {
+    title: "Qual é a sua comunidade?",
+    pages: [
+      { p: 2, src: "slides/comunidade/p2.webp" },
+      { p: 3, src: "slides/comunidade/p3.webp", highlight: true },
+      { p: 5, src: "slides/comunidade/p5.webp" },
+      { p: 6, src: "slides/comunidade/p6.webp" },
+      { p: 9, src: "slides/comunidade/p9.webp" },
+      { p: 12, src: "slides/comunidade/p12.webp" },
+      { p: 13, src: "slides/comunidade/p13.webp", highlight: true }
+    ]
+  },
+  verticais: {
+    title: "Verticais e Horizontais",
+    pages: [
+      { p: 3, src: "slides/verticais/p3.webp" },
+      { p: 4, src: "slides/verticais/p4.webp" },
+      { p: 5, src: "slides/verticais/p5.webp" },
+      { p: 6, src: "slides/verticais/p6.webp" },
+      { p: 8, src: "slides/verticais/p8.webp" },
+      { p: 9, src: "slides/verticais/p9.webp" },
+      { p: 10, src: "slides/verticais/p10.webp" },
+      { p: 12, src: "slides/verticais/p12.webp" },
+      { p: 13, src: "slides/verticais/p13.webp" },
+      { p: 14, src: "slides/verticais/p14.webp" },
+      { p: 17, src: "slides/verticais/p17.webp", highlight: true }
+    ]
+  },
+  historia: {
+    title: "História de Criação",
+    pages: [
+      { p: 5, src: "slides/historia/p5.webp" },
+      { p: 7, src: "slides/historia/p7.webp" },
+      { p: 8, src: "slides/historia/p8.webp" },
+      { p: 10, src: "slides/historia/p10.webp" },
+      { p: 21, src: "slides/historia/p21.webp", highlight: true }
+    ]
+  }
+};
+
+// Mapa de chaves de pergunta → label legível pra export
+const KEY_LABELS = {
+  "ikigai.habilidade": ["Ikigai · 5 Esferas", "Habilidade — O que sabe fazer?"],
+  "ikigai.felicidade": ["Ikigai · 5 Esferas", "Felicidade — O que importa?"],
+  "ikigai.oportunidade": ["Ikigai · 5 Esferas", "Oportunidade — O que vê ao redor?"],
+  "ikigai.paixao": ["Ikigai · 5 Esferas", "Paixão — O que faz vibrar?"],
+  "ikigai.servico": ["Ikigai · 5 Esferas", "Serviço — O que pode oferecer?"],
+  "ikigai.diff1": ["Ikigai · 6 Diferenciais", "Alternativas competitivas"],
+  "ikigai.diff2": ["Ikigai · 6 Diferenciais", "Atributos únicos"],
+  "ikigai.diff3": ["Ikigai · 6 Diferenciais", "Valor (e prova)"],
+  "ikigai.diff4": ["Ikigai · 6 Diferenciais", "Características do mercado-alvo"],
+  "ikigai.diff5": ["Ikigai · 6 Diferenciais", "Categoria de mercado"],
+  "ikigai.diff6": ["Ikigai · 6 Diferenciais", "Tendências relevantes"],
+  "comunidade.q1": ["Comunidade · Você já faz parte", "Quando eu falo, quem escuta?"],
+  "comunidade.q2": ["Comunidade · Você já faz parte", "Com quem e onde passo meu tempo?"],
+  "comunidade.q3": ["Comunidade · Você já faz parte", "Em quais situações sou mais autêntico?"],
+  "comunidade.q4": ["Comunidade · Você já faz parte", "Com quem convivo apesar de não gostar tanto?"],
+  "comunidade.util1": ["Comunidade · 4 Utilidades", "Utilidade de Lugar"],
+  "comunidade.util2": ["Comunidade · 4 Utilidades", "Utilidade da Forma"],
+  "comunidade.util3": ["Comunidade · 4 Utilidades", "Utilidade do Tempo"],
+  "comunidade.util4": ["Comunidade · 4 Utilidades", "Utilidade da Posse"],
+  "verticais.lista_v": ["Verticais & Horizontais", "Lista de Verticais"],
+  "verticais.lista_h": ["Verticais & Horizontais", "Lista de Horizontais"],
+  "verticais.combos": ["Verticais & Horizontais", "Combinações (V + H)"],
+  "historia.passado": ["História de Criação", "Passado: de onde veio?"],
+  "historia.inflexao": ["História de Criação", "Ponto de inflexão"],
+  "historia.convite": ["História de Criação", "Convite: quem é hoje?"]
+};
+
+const BLOCK_NAMES = {
+  ikigai: "Ikigai",
+  comunidade: "Comunidade",
+  verticais: "Verticais & Horizontais",
+  historia: "História de Criação"
+};
+
+// ============ STORAGE ============
+const STORAGE_KEY = "workshop_caique_v1";
+const META_KEY = "workshop_caique_meta_v1";
+
+function loadAll() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveAll(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  const meta = { lastSave: Date.now() };
+  localStorage.setItem(META_KEY, JSON.stringify(meta));
+}
+
+// ============ BOOT ============
+const state = {
+  data: loadAll(),
+  currentBlock: "ikigai"
+};
+
+// Hidratar textareas
+document.querySelectorAll("textarea[data-key]").forEach(ta => {
+  const key = ta.dataset.key;
+  const val = state.data[key] || "";
+  ta.value = val;
+  autosize(ta);
+  markFilled(ta);
+});
+
+// Autosize util
+function autosize(ta) {
+  ta.style.height = "auto";
+  ta.style.height = (ta.scrollHeight + 2) + "px";
+}
+
+function markFilled(ta) {
+  const card = ta.closest(".question");
+  if (!card) return;
+  card.dataset.filled = (ta.value.trim().length > 0) ? "true" : "false";
+}
+
+// Wire up textareas
+document.querySelectorAll("textarea[data-key]").forEach(ta => {
+  ta.addEventListener("input", () => {
+    autosize(ta);
+    markFilled(ta);
+    state.data[ta.dataset.key] = ta.value;
+    debouncedSave();
+  });
+  ta.addEventListener("blur", () => {
+    state.data[ta.dataset.key] = ta.value;
+    saveNow();
+  });
+});
+
+// Debounced save (300ms)
+let saveTimer = null;
+function debouncedSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveNow, 600);
+}
+
+function saveNow() {
+  saveAll(state.data);
+  showSaved();
+  updateProgress();
+}
+
+// ============ SAVED INDICATOR ============
+const savedEl = document.getElementById("savedIndicator");
+const savedText = document.getElementById("savedText");
+let savedTimer = null;
+
+function showSaved() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+  savedText.textContent = `Salvo às ${hh}:${mm}`;
+  savedEl.classList.add("visible");
+  clearTimeout(savedTimer);
+  savedTimer = setTimeout(() => savedEl.classList.remove("visible"), 2200);
+}
+
+// ============ NAVEGAÇÃO ============
+const navBtns = document.querySelectorAll(".nav-btn");
+const blocks = document.querySelectorAll(".block");
+
+navBtns.forEach(btn => {
+  btn.addEventListener("click", () => switchBlock(btn.dataset.target));
+});
+
+function switchBlock(name) {
+  state.currentBlock = name;
+  blocks.forEach(b => b.classList.toggle("active", b.dataset.block === name));
+  navBtns.forEach(b => b.classList.toggle("active", b.dataset.target === name));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  updateProgress();
+}
+
+// ============ PROGRESSO ============
+function blockQuestions(blockName) {
+  return Array.from(document.querySelectorAll(`section[data-block="${blockName}"] textarea[data-key]`));
+}
+
+function blockProgress(blockName) {
+  const qs = blockQuestions(blockName);
+  if (qs.length === 0) return { filled: 0, total: 0, pct: 0 };
+  const filled = qs.filter(q => (state.data[q.dataset.key] || "").trim().length > 0).length;
+  return { filled, total: qs.length, pct: Math.round((filled / qs.length) * 100) };
+}
+
+function updateProgress() {
+  const cur = state.currentBlock;
+  const { filled, total, pct } = blockProgress(cur);
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressText").textContent = `${filled} / ${total}`;
+  document.getElementById("progressBlock").textContent = BLOCK_NAMES[cur];
+
+  navBtns.forEach(btn => {
+    const p = blockProgress(btn.dataset.target);
+    btn.dataset.complete = (p.filled === p.total && p.total > 0) ? "true" : "false";
+  });
+}
+
+// ============ MODAL HELPERS ============
+function openModal(el) {
+  el.classList.add("visible");
+  document.body.style.overflow = "hidden";
+}
+function closeModal(el) {
+  el.classList.remove("visible");
+  document.body.style.overflow = "";
+}
+document.querySelectorAll(".modal-backdrop").forEach(bd => {
+  bd.addEventListener("click", () => closeModal(bd));
+});
+document.querySelectorAll("[data-close]").forEach(b => {
+  b.addEventListener("click", e => {
+    e.stopPropagation();
+    closeModal(b.closest(".modal-backdrop"));
+  });
+});
+
+// ============ SLIDES CARROSSEL ============
+const slidesModal = document.getElementById("slidesModal");
+const carouselTrack = document.getElementById("carouselTrack");
+const carouselDots = document.getElementById("carouselDots");
+const carouselMeta = document.getElementById("carouselMeta");
+
+document.querySelectorAll("[data-slides]").forEach(btn => {
+  btn.addEventListener("click", () => openSlides(btn.dataset.slides));
+});
+
+function openSlides(key) {
+  const data = SLIDES[key];
+  if (!data) return;
+  document.getElementById("slidesTitle").textContent = data.title;
+  carouselTrack.innerHTML = "";
+  carouselDots.innerHTML = "";
+
+  data.pages.forEach((page, i) => {
+    const slide = document.createElement("div");
+    slide.className = "carousel-slide";
+    slide.innerHTML = `<img src="${page.src}" loading="lazy" alt="Slide página ${page.p}">`;
+    carouselTrack.appendChild(slide);
+
+    const dot = document.createElement("button");
+    dot.className = "carousel-dot" + (i === 0 ? " active" : "");
+    dot.setAttribute("aria-label", `Página ${page.p}`);
+    dot.addEventListener("click", () => {
+      carouselTrack.scrollTo({ left: i * carouselTrack.clientWidth, behavior: "smooth" });
+    });
+    carouselDots.appendChild(dot);
+  });
+
+  const total = data.pages.length;
+  carouselMeta.textContent = `Slide 1 de ${total} · pág. ${data.pages[0].p}${data.pages[0].highlight ? " · âncora" : ""}`;
+  openModal(slidesModal);
+
+  // Reset scroll position
+  requestAnimationFrame(() => {
+    carouselTrack.scrollLeft = 0;
+  });
+}
+
+// Sync dots with scroll
+carouselTrack.addEventListener("scroll", () => {
+  const idx = Math.round(carouselTrack.scrollLeft / carouselTrack.clientWidth);
+  const dots = carouselDots.querySelectorAll(".carousel-dot");
+  dots.forEach((d, i) => d.classList.toggle("active", i === idx));
+  const key = Object.keys(SLIDES).find(k => SLIDES[k].title === document.getElementById("slidesTitle").textContent);
+  if (key && SLIDES[key].pages[idx]) {
+    const page = SLIDES[key].pages[idx];
+    carouselMeta.textContent = `Slide ${idx + 1} de ${SLIDES[key].pages.length} · pág. ${page.p}${page.highlight ? " · âncora" : ""}`;
+  }
+});
+
+// ============ EXPORT ============
+const exportModal = document.getElementById("exportModal");
+const exportSummary = document.getElementById("exportSummary");
+
+document.getElementById("btnExport").addEventListener("click", () => {
+  // Atualizar resumo
+  const blocks_ = ["ikigai", "comunidade", "verticais", "historia"];
+  const lines = blocks_.map(b => {
+    const p = blockProgress(b);
+    return `<strong>${BLOCK_NAMES[b]}:</strong> ${p.filled}/${p.total}`;
+  });
+  exportSummary.innerHTML = lines.join(" · ");
+  openModal(exportModal);
+});
+
+function buildExportText() {
+  let out = "";
+  out += "═══════════════════════════════════════\n";
+  out += "WORKSHOP MARCA PESSOAL — CAÍQUE\n";
+  out += "Reflexões pós-workshop\n";
+  out += "═══════════════════════════════════════\n";
+
+  const now = new Date();
+  out += `Exportado em ${now.toLocaleDateString("pt-BR")} ${now.toLocaleTimeString("pt-BR")}\n\n`;
+
+  let currentSection = "";
+  Object.keys(KEY_LABELS).forEach(key => {
+    const [section, label] = KEY_LABELS[key];
+    const val = (state.data[key] || "").trim();
+    if (section !== currentSection) {
+      out += `\n━━━ ${section.toUpperCase()} ━━━\n\n`;
+      currentSection = section;
+    }
+    out += `▸ ${label}\n`;
+    out += val ? val + "\n\n" : "(em branco)\n\n";
+  });
+  return out;
+}
+
+document.getElementById("btnCopyAll").addEventListener("click", async () => {
+  const text = buildExportText();
+  try {
+    await navigator.clipboard.writeText(text);
+    flashButton("btnCopyAll", "Copiado!");
+  } catch (e) {
+    // Fallback: textarea hack
+    const tmp = document.createElement("textarea");
+    tmp.value = text;
+    document.body.appendChild(tmp);
+    tmp.select();
+    try { document.execCommand("copy"); flashButton("btnCopyAll", "Copiado!"); }
+    catch { alert("Não consegui copiar automaticamente. Selecione manualmente e copie."); }
+    document.body.removeChild(tmp);
+  }
+});
+
+document.getElementById("btnEmail").addEventListener("click", () => {
+  const text = buildExportText();
+  const subject = "Workshop Marca Pessoal — Reflexões";
+  const body = encodeURIComponent(text);
+  window.location.href = `mailto:isabellecardosom@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+});
+
+function flashButton(id, msg) {
+  const btn = document.getElementById(id);
+  const titleEl = btn.querySelector(".export-option-title");
+  const original = titleEl.textContent;
+  titleEl.textContent = msg;
+  titleEl.style.color = "var(--accent)";
+  setTimeout(() => {
+    titleEl.textContent = original;
+    titleEl.style.color = "";
+  }, 1600);
+}
+
+// ============ SERVICE WORKER ============
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(err => {
+      console.log("SW registration failed:", err);
+    });
+  });
+}
+
+// ============ INIT ============
+updateProgress();
+
+// Atualizar progresso ao trocar de bloco (visualmente)
+// (já chamado em switchBlock)
+</script>
+
+</body>
+</html>
