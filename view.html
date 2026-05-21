@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#060606" />
+<title>View Master · Workshop Caíque</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<style>
+  :root {
+    --bg: #060606;
+    --bg-2: #0d0d0d;
+    --card: #1A1A1A;
+    --text: #F2F2F2;
+    --muted: #A0A0A0;
+    --accent: #07D379;
+    --border: #2a2a2a;
+    --font-display: "SF Pro Display", system-ui, -apple-system, sans-serif;
+    --font-text: "SF Pro Text", system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--font-text); }
+  body { min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+  .gate {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .gate-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px;
+    max-width: 360px;
+    width: 100%;
+  }
+  .gate h2 { font-family: var(--font-display); margin: 0 0 6px; font-size: 22px; }
+  .gate p { color: var(--muted); font-size: 14px; margin: 0 0 18px; line-height: 1.5; }
+  .gate input {
+    width: 100%;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    margin-bottom: 12px;
+  }
+  .gate input:focus { border-color: var(--accent); }
+  .gate button {
+    width: 100%;
+    background: var(--accent);
+    color: #001a0e;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: var(--font-display);
+    cursor: pointer;
+  }
+  .gate .err { color: #c0392b; font-size: 13px; margin-top: 4px; }
+
+  header {
+    position: sticky; top: 0;
+    background: rgba(6,6,6,.94);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: calc(env(safe-area-inset-top) + 14px) 20px 14px;
+    z-index: 10;
+  }
+  .h-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  h1 {
+    font-family: var(--font-display);
+    font-size: 17px; font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  h1 span { color: var(--accent); }
+  .status {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .status .dot {
+    width: 7px; height: 7px;
+    border-radius: 999px;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .status.offline .dot { background: #c0392b; animation: none; }
+
+  .meta-bar {
+    display: flex; justify-content: space-between;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .meta-bar strong { color: var(--text); font-weight: 500; }
+  .progress-mini {
+    display: flex; gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .progress-mini span {
+    padding: 4px 10px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+  .progress-mini span.full { color: var(--accent); border-color: rgba(7,211,121,.4); }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+  }
+
+  .section {
+    margin-bottom: 32px;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 0 0 16px;
+  }
+  .answer {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 12px;
+  }
+  .answer-label {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 8px;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+  }
+  .answer-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #d8d8d8;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .answer-text.empty {
+    color: #555;
+    font-style: italic;
+  }
+  .answer-files {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-top: 14px;
+  }
+  .answer-files .ph {
+    width: 80px; height: 80px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .answer-files img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .toolbar {
+    position: fixed;
+    bottom: 16px; left: 16px; right: 16px;
+    display: flex; gap: 8px;
+    z-index: 20;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .toolbar button {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    backdrop-filter: blur(20px);
+    transition: all .15s ease;
+  }
+  .toolbar button:hover { border-color: var(--accent); color: var(--accent); }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-state .big { font-size: 40px; margin-bottom: 10px; }
+
+  /* Lightbox */
+  .lb {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.92);
+    z-index: 60;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .lb.visible { display: flex; }
+  .lb img { max-width: 100%; max-height: 90vh; border-radius: 10px; }
+  .lb-close {
+    position: absolute; top: calc(env(safe-area-inset-top) + 14px); right: 14px;
+    width: 40px; height: 40px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 22px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ GATE ============ -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <h2>View Master</h2>
+    <p>Respostas do Caíque · uso interno Celulose.</p>
+    <input type="password" id="pwd" placeholder="Código de acesso" autocomplete="off">
+    <button id="enter">Entrar</button>
+    <div class="err" id="gateErr" style="display:none">Código inválido.</div>
+  </div>
+</div>
+
+<!-- ============ MAIN APP (oculto até autenticar) ============ -->
+<div id="app" style="display:none">
+<header>
+  <div class="h-row">
+    <h1>Workshop · Caíque<span>.</span></h1>
+    <div class="status" id="status"><span class="dot"></span><span id="statusText">Conectando…</span></div>
+  </div>
+  <div class="meta-bar">
+    <span>Última atualização: <strong id="lastUpdate">—</strong></span>
+    <span><strong id="filledCount">0</strong> / 25 respostas</span>
+  </div>
+  <div class="progress-mini" id="progressMini"></div>
+</header>
+
+<main id="main">
+  <div class="empty-state" id="emptyState">
+    <div class="big">⏳</div>
+    <div>Aguardando primeira resposta do Caíque…</div>
+  </div>
+</main>
+
+<div class="toolbar">
+  <button id="btnCopy">📋 Copiar tudo</button>
+  <button id="btnReload">↻ Atualizar</button>
+</div>
+</div>
+
+<!-- Lightbox -->
+<div class="lb" id="lb">
+  <button class="lb-close" id="lbClose">×</button>
+  <img id="lbImg" alt="">
+</div>
+
+<script>
+// ============ CONFIG ============
+const SUPABASE_URL = "https://eztihkrqxakkvaadmpqj.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6dGloa3JxeGFra3ZhYWRtcHFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNjUzMzUsImV4cCI6MjA5NDk0MTMzNX0.iwujwQD0aXM5B_nSxUUT26urTT1Ux0WUlLfwowTEHhU";
+const USER_ID = "caique";
+const ACCESS_CODE = "celulose2026";
+
+const SECTIONS = [
+  { title: "Ikigai · 5 Esferas", keys: [
+    ["ikigai.habilidade", "Habilidade — O que sabe fazer?"],
+    ["ikigai.felicidade", "Felicidade — O que importa?"],
+    ["ikigai.oportunidade", "Oportunidade — O que vê ao redor?"],
+    ["ikigai.paixao", "Paixão — O que faz vibrar?"],
+    ["ikigai.servico", "Serviço — O que pode oferecer?"]
+  ]},
+  { title: "Ikigai · 6 Diferenciais", keys: [
+    ["ikigai.diff1", "Alternativas competitivas"],
+    ["ikigai.diff2", "Atributos únicos"],
+    ["ikigai.diff3", "Valor (e prova)"],
+    ["ikigai.diff4", "Características do mercado-alvo"],
+    ["ikigai.diff5", "Categoria de mercado"],
+    ["ikigai.diff6", "Tendências relevantes"]
+  ]},
+  { title: "Comunidade · Você já faz parte", keys: [
+    ["comunidade.q1", "Quando eu falo, quem escuta?"],
+    ["comunidade.q2", "Com quem e onde passo meu tempo?"],
+    ["comunidade.q3", "Em quais situações sou mais autêntico?"],
+    ["comunidade.q4", "Com quem convivo apesar de não gostar tanto?"]
+  ]},
+  { title: "Comunidade · 4 Utilidades", keys: [
+    ["comunidade.util1", "Utilidade de Lugar"],
+    ["comunidade.util2", "Utilidade da Forma"],
+    ["comunidade.util3", "Utilidade do Tempo"],
+    ["comunidade.util4", "Utilidade da Posse"]
+  ]},
+  { title: "Verticais & Horizontais", keys: [
+    ["verticais.lista_v", "Lista de Verticais"],
+    ["verticais.lista_h", "Lista de Horizontais"],
+    ["verticais.combos", "Combinações (V + H)"]
+  ]},
+  { title: "História de Criação", keys: [
+    ["historia.passado", "Passado: de onde veio?"],
+    ["historia.inflexao", "Ponto de inflexão"],
+    ["historia.convite", "Convite: quem é hoje?"]
+  ]}
+];
+
+const BLOCKS = {
+  "Ikigai": ["ikigai.habilidade","ikigai.felicidade","ikigai.oportunidade","ikigai.paixao","ikigai.servico","ikigai.diff1","ikigai.diff2","ikigai.diff3","ikigai.diff4","ikigai.diff5","ikigai.diff6"],
+  "Comunidade": ["comunidade.q1","comunidade.q2","comunidade.q3","comunidade.q4","comunidade.util1","comunidade.util2","comunidade.util3","comunidade.util4"],
+  "Eixos": ["verticais.lista_v","verticais.lista_h","verticais.combos"],
+  "História": ["historia.passado","historia.inflexao","historia.convite"]
+};
+
+// ============ GATE ============
+const gateEl = document.getElementById("gate");
+const appEl = document.getElementById("app");
+const STORED_AUTH_KEY = "view_master_auth";
+
+function unlock() {
+  gateEl.style.display = "none";
+  appEl.style.display = "block";
+  boot();
+}
+
+if (sessionStorage.getItem(STORED_AUTH_KEY) === "1") {
+  unlock();
+}
+
+document.getElementById("enter").addEventListener("click", tryAuth);
+document.getElementById("pwd").addEventListener("keydown", e => { if (e.key === "Enter") tryAuth(); });
+function tryAuth() {
+  const v = document.getElementById("pwd").value.trim();
+  if (v === ACCESS_CODE) {
+    sessionStorage.setItem(STORED_AUTH_KEY, "1");
+    unlock();
+  } else {
+    document.getElementById("gateErr").style.display = "block";
+  }
+}
+
+// ============ BOOT ============
+let sb, currentData = {}, currentUpdated = null;
+
+async function boot() {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  await loadData();
+
+  // Realtime subscription
+  sb.channel("respostas-changes")
+    .on("postgres_changes",
+      { event: "*", schema: "public", table: "respostas", filter: `id=eq.${USER_ID}` },
+      payload => {
+        if (payload.new && payload.new.data) {
+          currentData = payload.new.data;
+          currentUpdated = payload.new.updated_at;
+          render();
+          pulseStatus();
+        }
+      }
+    )
+    .subscribe(status => {
+      const el = document.getElementById("status");
+      const txt = document.getElementById("statusText");
+      if (status === "SUBSCRIBED") { el.classList.remove("offline"); txt.textContent = "Ao vivo"; }
+      else if (status === "CLOSED" || status === "CHANNEL_ERROR") { el.classList.add("offline"); txt.textContent = "Desconectado"; }
+    });
+
+  document.getElementById("btnReload").addEventListener("click", loadData);
+  document.getElementById("btnCopy").addEventListener("click", copyAll);
+}
+
+function pulseStatus() {
+  const el = document.getElementById("status");
+  el.style.color = "var(--accent)";
+  setTimeout(() => { el.style.color = ""; }, 1200);
+}
+
+async function loadData() {
+  try {
+    const { data, error } = await sb
+      .from("respostas")
+      .select("data, updated_at")
+      .eq("id", USER_ID)
+      .maybeSingle();
+    if (error) throw error;
+    currentData = (data && data.data) ? data.data : {};
+    currentUpdated = data ? data.updated_at : null;
+    render();
+  } catch (e) {
+    console.error("Load error:", e);
+    document.getElementById("emptyState").innerHTML = `<div class="big">⚠️</div><div>Erro ao carregar: ${e.message}</div>`;
+  }
+}
+
+function relativeTime(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  const now = Date.now();
+  const diff = Math.floor((now - d.getTime()) / 1000);
+  if (diff < 60) return "agora";
+  if (diff < 3600) return `há ${Math.floor(diff/60)} min`;
+  if (diff < 86400) return `há ${Math.floor(diff/3600)} h`;
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth()+1).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${dd}/${mm} ${hh}:${min}`;
+}
+
+function render() {
+  const main = document.getElementById("main");
+  const empty = document.getElementById("emptyState");
+
+  const allKeys = SECTIONS.flatMap(s => s.keys.map(k => k[0]));
+  const filled = allKeys.filter(k => (currentData[k] || "").trim().length > 0).length;
+  document.getElementById("filledCount").textContent = filled;
+  document.getElementById("lastUpdate").textContent = relativeTime(currentUpdated);
+
+  // Progresso mini por bloco
+  const mini = document.getElementById("progressMini");
+  mini.innerHTML = "";
+  Object.entries(BLOCKS).forEach(([name, keys]) => {
+    const f = keys.filter(k => (currentData[k] || "").trim().length > 0).length;
+    const tag = document.createElement("span");
+    tag.textContent = `${name} ${f}/${keys.length}`;
+    if (f === keys.length) tag.classList.add("full");
+    mini.appendChild(tag);
+  });
+
+  if (filled === 0 && !hasAnyFiles()) {
+    empty.style.display = "block";
+    // Limpa seções renderizadas anteriormente
+    main.querySelectorAll(".section").forEach(s => s.remove());
+    return;
+  }
+  empty.style.display = "none";
+
+  // Limpa e renderiza seções
+  main.querySelectorAll(".section").forEach(s => s.remove());
+  SECTIONS.forEach(section => {
+    const sec = document.createElement("div");
+    sec.className = "section";
+    sec.innerHTML = `<h3 class="section-title">${section.title}</h3>`;
+    section.keys.forEach(([key, label]) => {
+      const val = (currentData[key] || "").trim();
+      const files = Array.isArray(currentData[key + ".files"]) ? currentData[key + ".files"] : [];
+      if (!val && files.length === 0) return; // pula vazias
+
+      const card = document.createElement("div");
+      card.className = "answer";
+      card.innerHTML = `
+        <h4 class="answer-label">${label}</h4>
+        <div class="answer-text ${val ? "" : "empty"}">${val ? escapeHtml(val) : "(sem texto, só anexos)"}</div>
+        ${files.length ? `<div class="answer-files">${files.map(f =>
+          `<div class="ph"><img src="${f.url}" loading="lazy" data-full="${f.url}"></div>`
+        ).join("")}</div>` : ""}
+      `;
+      card.querySelectorAll(".answer-files img").forEach(img => {
+        img.addEventListener("click", () => openLB(img.dataset.full));
+      });
+      sec.appendChild(card);
+    });
+    if (sec.querySelectorAll(".answer").length > 0) {
+      main.appendChild(sec);
+    }
+  });
+}
+
+function hasAnyFiles() {
+  return Object.keys(currentData).some(k => k.endsWith(".files") && Array.isArray(currentData[k]) && currentData[k].length > 0);
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+
+// ============ COPY ALL ============
+async function copyAll() {
+  let out = "═══════════════════════════════════════\n";
+  out += "WORKSHOP MARCA PESSOAL — CAÍQUE\n";
+  out += "═══════════════════════════════════════\n";
+  out += `Última atualização: ${relativeTime(currentUpdated)}\n\n`;
+  SECTIONS.forEach(section => {
+    out += `\n━━━ ${section.title.toUpperCase()} ━━━\n\n`;
+    section.keys.forEach(([key, label]) => {
+      const val = (currentData[key] || "").trim();
+      const files = Array.isArray(currentData[key + ".files"]) ? currentData[key + ".files"] : [];
+      out += `▸ ${label}\n`;
+      out += (val || "(em branco)") + "\n";
+      if (files.length) {
+        out += `📎 ${files.length} anexo(s):\n`;
+        files.forEach(f => { out += "   " + f.url + "\n"; });
+      }
+      out += "\n";
+    });
+  });
+  try {
+    await navigator.clipboard.writeText(out);
+    const btn = document.getElementById("btnCopy");
+    const orig = btn.textContent;
+    btn.textContent = "✓ Copiado";
+    btn.style.color = "var(--accent)";
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ""; }, 1600);
+  } catch {
+    alert("Não consegui copiar. Selecione manualmente.");
+  }
+}
+
+// ============ LIGHTBOX ============
+const lb = document.getElementById("lb");
+const lbImg = document.getElementById("lbImg");
+function openLB(src) { lbImg.src = src; lb.classList.add("visible"); document.body.style.overflow = "hidden"; }
+lb.addEventListener("click", e => { if (e.target === lb) { lb.classList.remove("visible"); document.body.style.overflow=""; } });
+document.getElementById("lbClose").addEventListener("click", () => { lb.classList.remove("visible"); document.body.style.overflow=""; });
+</script>
+</body>
+</html>

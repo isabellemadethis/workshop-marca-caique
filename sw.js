@@ -2,12 +2,13 @@
 // Cache-first com fallback de rede pra recursos estáticos.
 // Bump CACHE_VERSION sempre que algo mudar pra forçar refresh.
 
-const CACHE_VERSION = "v1.0.0";
+const CACHE_VERSION = "v1.1.0";
 const CACHE_NAME = `workshop-marca-${CACHE_VERSION}`;
 
 const ASSETS = [
   "./",
   "./index.html",
+  "./view.html",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
